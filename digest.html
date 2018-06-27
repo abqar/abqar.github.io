@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja-abqar">
+ <head>
+  <meta charset="utf-8" />
+  <title>digest</title>
+  <meta name="robots" content="NOINDEX, NOFOLLOW" />
+  <meta name="author" content="abqar" />
+  <style type="text/css">
+* { margin: 0; padding: 0; }
+body {
+  color: #fff;
+  font-family: Ricty, Inconsolata, Osaka, monospace, serif;
+  font-size: 12pt;
+  line-heght: 1.5em;
+  width: 100%;
+  background-color: #333;
+}
+h1 {
+  margin-top:  1em;
+  margin-left: 1em;
+}
+p {
+  margin: 1em 3em;
+}
+button {
+  padding: .5em;
+  margin-top: .5em;
+  font-size: 12pt;
+  font-weight: bold;
+}
+input {
+  padding: .5em;
+  margin-top: .5em;
+  font-size: 12pt;
+  font-weight: bold;
+}
+#container {
+  margin: .5em;
+}
+#input {
+  float: left;
+  width: 50%;
+}
+#output {
+  float: left;
+  width: 50%;
+}
+#stderr {
+  color: #f00;
+}
+  </style>
+  <script type="text/javascript">
+const LEN = 10;
+
+function sha256 (str) {
+  var buffer = new TextEncoder("utf-8").encode(str);
+  return crypto.subtle.digest("SHA-256", buffer).then(function (hash) {
+    return hex(hash);
+  });
+}
+
+function hex (buffer) {
+  var hexCodes = [];
+  var view = new DataView(buffer);
+  for (var i = 0; i < view.byteLength; i += 4) {
+    var value = view.getUint32(i)
+    var stringValue = value.toString(16)
+    var padding = "00000000"
+    var paddedValue = (padding + stringValue).slice(-padding.length)
+    hexCodes.push(paddedValue);
+  }
+  return hexCodes.join("");
+}
+
+function packHex (hex) {
+  var bin = "";
+  for (var i = 0; i < hex.length; i += 2) {
+    var cc = parseInt(hex.substr(i, 2), 16);
+    bin += String.fromCharCode(cc);
+  }
+  return bin;
+}
+
+function calc () {
+  document.getElementById("stdout").innerHTML = "";
+  document.getElementById("stderr").innerHTML = "";
+  try {
+    var domain = document.getElementById("domain").value;
+    var azucar = document.getElementById("azucar").value;
+    var prefix = document.getElementById("prefix").value;
+    var k      = domain + ":" + azucar + "\n";
+    sha256(k).then(function(digest) {
+      var v = window.btoa(packHex(digest));
+      v = prefix + v.substr(0, LEN);
+      document.getElementById("v").value = v;
+    });
+  } catch (e) {
+    document.getElementById("stderr").innerHTML = e;
+  }
+}
+
+function show (display = false) {
+  var v = document.getElementById("v").value;
+  if(copy(v)) p("done");
+  if(display) p(v);
+}
+
+function p (string) {
+  document.getElementById("stdout").innerHTML += string + "<br />"
+}
+
+function copy (string) {
+  var temp = document.createElement("div");
+  temp.appendChild(document.createElement("pre")).textContent = string;
+  var s = temp.style;
+  s.position = "fixed";
+  s.left = "-100%";
+  document.body.appendChild(temp);
+  document.getSelection().selectAllChildren(temp);
+  var result = document.execCommand("copy");
+  document.body.removeChild(temp);
+  return result;
+}
+  </script>
+ </head>
+ <body>
+  <h1>digest</h1>
+  <div id="container">
+   <div id="input">
+    <form>
+      <p><input type="text"     id="domain" name="domain" placeholder="domain" tabindex="1" onchange="calc();" value="" /></p>
+      <p><input type="password" id="azucar" name="asucar" placeholder="azucar" tabindex="2" onchange="calc();" /></p>
+      <p><input type="password" id="prefix" name="prefix" placeholder="prefix" tabindex="3" onchange="calc();" value="" /></p>
+      <p>
+       <button type="button" onclick="show();" accesskey="c" tabindex="4">copy</button>
+      </p>
+      <input type="hidden" id="v" value="" />
+    </form>
+   </div>
+   <div id="output">
+    <div id="stdout"></div>
+    <div id="stderr"></div>
+   </div>
+  </div>
+ </body>
+</html>
