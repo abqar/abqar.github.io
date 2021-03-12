@@ -50,7 +50,6 @@ input {
 }
   </style>
   <script type="text/javascript">
-const LEN = 10;
 
 function sha256 (str) {
   var buffer = new TextEncoder("utf-8").encode(str);
@@ -88,11 +87,11 @@ function calc () {
     var domain = document.getElementById("domain").value;
     var azucar = document.getElementById("azucar").value;
     var prefix = document.getElementById("prefix").value;
+    var len    = document.getElementById("length").value;
     var k      = domain + ":" + azucar + "\n";
     sha256(k).then(function(digest) {
-      var v = window.btoa(packHex(digest));
-      v = prefix + v.substr(0, LEN);
-      document.getElementById("v").value = v;
+      var res = prefix + window.btoa(packHex(digest)).substr(0, len);
+      document.getElementById("res").value = res;
     });
   } catch (e) {
     document.getElementById("stderr").innerHTML = e;
@@ -100,9 +99,9 @@ function calc () {
 }
 
 function show (display = false) {
-  var v = document.getElementById("v").value;
-  if(copy(v)) p("done");
-  if(display) p(v);
+  var res = document.getElementById("res").value;
+  if(copy(res)) p("done");
+  if(display) p(res);
 }
 
 function p (string) {
@@ -128,13 +127,14 @@ function copy (string) {
   <div id="container">
    <div id="input">
     <form>
-      <p><input type="text"     id="domain" name="domain" placeholder="domain" tabindex="1" onchange="calc();" value="" /></p>
+      <p><input type="text" id="domain" name="domain" placeholder="domain" tabindex="1" onchange="calc();" value="" /></p>
       <p><input type="password" id="azucar" name="asucar" placeholder="azucar" tabindex="2" onchange="calc();" /></p>
       <p><input type="password" id="prefix" name="prefix" placeholder="prefix" tabindex="3" onchange="calc();" value="" /></p>
+      <p><input type="number" id="length" name="length" placeholder="length" tabindex="4" onchange="calc();" value="10" /></p>
       <p>
-       <button type="button" onclick="show();" accesskey="c" tabindex="4">copy</button>
+       <button type="button" onclick="show();" accesskey="c" tabindex="5">copy</button>
       </p>
-      <input type="hidden" id="v" value="" />
+      <input type="hidden" id="res" value="" />
     </form>
    </div>
    <div id="output">
