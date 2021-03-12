@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja-abqar">
+ <head>
+  <meta charset="utf-8" />
+  <title>privacy stash</title>
+  <meta name="robots" content="NOINDEX, NOFOLLOW" />
+  <meta name="author" content="abqar" />
+  <style type="text/css">
+* { margin: 0; padding: 0; }
+body {
+  color: #fff;
+  font-family: Ricty, Inconsolata, Osaka, monospace, serif;
+  font-size: 12pt;
+  line-heght: 1.5em;
+  width: 100%;
+  background-color: #333;
+}
+h1 {
+  margin-top:  1em;
+  margin-left: 1em;
+}
+p {
+  margin: 1em 3em;
+}
+button {
+  padding: .5em;
+  margin-top: .5em;
+  font-size: 12pt;
+  font-weight: bold;
+}
+textarea, input {
+  padding: .5em;
+  margin-top: .5em;
+  font-size: 12pt;
+  font-weight: bold;
+}
+textarea {
+  width:  80%;
+  height: 30em;
+}
+#container {
+  margin: .5em;
+}
+#input {
+  float: left;
+  width: 50%;
+}
+#output {
+  float: left;
+  width: 50%;
+}
+#stderr {
+  color: #f00;
+}
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+  <script type="text/javascript">
+
+function encode () {
+  try {
+    document.getElementById("stdout").innerHTML = "";
+    document.getElementById("stderr").innerHTML = "";
+    let pw = document.getElementById("pw").value;
+    let original = document.getElementById("target").value;
+    let utf8_plain = CryptoJS.enc.Utf8.parse(original);
+    let encrypted = CryptoJS.AES.encrypt(utf8_plain, pw);
+    document.getElementById("stdout").innerHTML = encrypted;
+  } catch (e) {
+    document.getElementById("stderr").innerHTML = e;
+  }
+}
+function decode () {
+  try {
+    document.getElementById("stdout").innerHTML = "";
+    document.getElementById("stderr").innerHTML = "";
+    let pw = document.getElementById("pw").value;
+    let stashed = document.getElementById("target").value;
+    let decrypted = CryptoJS.AES.decrypt(stashed, pw);
+    let txt = decrypted.toString(CryptoJS.enc.Utf8).replace(/\n/g, "<br />\n");
+    document.getElementById("stdout").innerHTML = txt;
+  } catch (e) {
+    document.getElementById("stderr").innerHTML = e;
+  }
+}
+
+  </script>
+ </head>
+ <body>
+  <h1>privacy stash</h1>
+  <div id="container">
+   <div id="input">
+    <form>
+      <p><textarea type="text" id="target" name="target" placeholder="input message" tabindex="1" value="" /></textarea></p>
+      <p>
+        <input type="password" id="pw" name="pw" placeholder="pw" tabindex="2" />
+      </p>
+      <p>
+        <button type="button" onclick="encode();" accesskey="e" tabindex="3">encode</button>
+        <button type="button" onclick="decode();" accesskey="d" tabindex="4">decode</button>
+      </p>
+    </form>
+   </div>
+   <div id="output">
+    <div id="stdout"></div>
+    <div id="stderr"></div>
+   </div>
+  </div>
+ </body>
+</html>
