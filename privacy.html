@@ -52,8 +52,12 @@ textarea {
 #stderr {
   color: #f00;
 }
+#dec {
+  color: #ccc;
+}
+
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+  <script src="crypto-js.4-0-0.min.js"></script>
   <script type="text/javascript">
 
 function encode () {
@@ -74,7 +78,7 @@ function decode () {
     document.getElementById("stdout").innerHTML = "";
     document.getElementById("stderr").innerHTML = "";
     let pw = document.getElementById("pw").value;
-    let stashed = document.getElementById("target").value;
+    let stashed = document.getElementById("target").value.replace(/\n/g, "");
     let decrypted = CryptoJS.AES.decrypt(stashed, pw);
     let txt = decrypted.toString(CryptoJS.enc.Utf8).replace(/\n/g, "<br />\n");
     document.getElementById("stdout").innerHTML = txt;
@@ -82,10 +86,13 @@ function decode () {
     document.getElementById("stderr").innerHTML = e;
   }
 }
+function loaded () {
+  document.getElementById("dec").style = "color: #000;";
+}
 
   </script>
  </head>
- <body>
+ <body onLoad="loaded();">
   <h1>privacy stash</h1>
   <div id="container">
    <div id="input">
@@ -95,8 +102,8 @@ function decode () {
         <input type="password" id="pw" name="pw" placeholder="pw" tabindex="2" />
       </p>
       <p>
-        <button type="button" onclick="encode();" accesskey="e" tabindex="3">encode</button>
-        <button type="button" onclick="decode();" accesskey="d" tabindex="4">decode</button>
+        <button type="button" onclick="encode();" accesskey="e" tabindex="3" id="enc">encode</button>
+        <button type="button" onclick="decode();" accesskey="d" tabindex="4" id="dec">decode</button>
       </p>
     </form>
    </div>
