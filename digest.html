@@ -100,8 +100,11 @@ function calc () {
 
 function show (display = false) {
   var res = document.getElementById("res").value;
-  if(copy(res)) p("done");
-  if(display) p(res);
+  if (display) {
+    p(res);
+  } else if (copy(res)) {
+    p("done");
+  }
 }
 
 function p (string) {
@@ -133,6 +136,7 @@ function copy (string) {
       <p><input type="number" id="length" name="length" tabindex="4" onchange="calc();" value="10" /></p>
       <p>
        <button type="button" onclick="show();" accesskey="c" tabindex="5">copy</button>
+       <button type="button" onclick="show(true);" accesskey="s" tabindex="6">show</button>
       </p>
       <input type="hidden" id="res" value="" />
     </form>
